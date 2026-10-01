@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning-68 | Unblocked Games</title>
+    <style>
+        :root {
+            --bg: #121214;
+            --surface: #1e1e24;
+            --surface-hover: #2a2a35;
+            --accent: #7c3aed;
+            --accent-hover: #6d28d9;
+            --text: #f3f4f6;
+            --muted: #9ca3af;
+            --border: #2e2e38;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-bar {
+            width: 300px;
+            padding: 10px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .search-bar:focus { border-color: var(--accent); }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Game Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .game-thumb {
+            width: 100%;
+            height: 110px;
+            background: #272730;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+        }
+
+        .game-info {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+        }
+
+        .game-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-cat {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .play-badge {
+            background-color: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* Player View (Hidden by default) */
+        #playerView {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            max-width: 1400px;
+            margin: 20px auto;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .back-btn:hover { background: var(--surface-hover); }
+
+        .frame-container {
+            position: relative;
+            width: 100%;
+            height: 75vh;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Learning-68 Arcade</div>
+        <input type="text" id="searchBox" class="search-bar" placeholder="Search over 30+ games..." onkeyup="filterGames()">
+    </header>
+
+    <!-- Game Selection Grid -->
+    <div class="main-container" id="catalogView">
+        <div class="grid" id="gameGrid">
+            <!-- Dynamically populated games list -->
+        </div>
+    </div>
+
+    <!-- Active Game Player Wrapper -->
+    <div id="playerView">
+        <div class="player-header">
+            <button class="back-btn" onclick="goHome()">← Back to Games</button>
+            <div id="nowPlayingTitle" style="font-weight: bold; font-size: 1.1rem;"></div>
+            <button class="back-btn" onclick="toggleFullscreen()">Fullscreen</button>
+        </div>
+        <div class="frame-container" id="frameBox">
+            <iframe id="gameFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Massive library of popular browser/unblocked games
+        const popularGames = [
+            { name: "2048", cat: "Puzzle", icon: "🔢", url: "https://play2048.co/" },
+            { name: "Slope", cat: "Arcade", icon: "🟢", url: "https://kdata1.com/2020/10/slope/" },
+            { name: "Retro Bowl", cat: "Sports", icon: "🏈", url: "https://retrobowl.me/" },
+            { name: "Cookie Clicker", cat: "Idle", icon: "🍪", url: "https://orteil.dashnet.org/cookieclicker/" },
+            { name: "Pac-Man", cat: "Classic", icon: "🕹️", url: "https://www.google.com/logos/2010/pacman10-i.html" },
+            { name: "Tetris", cat: "Classic", icon: "🧩", url: "https://tetris.com/play-tetris" },
+            { name: "Flappy Bird", cat: "Skill", icon: "🐦", url: "https://flappybird.ee/" },
+            { name: "Moto X3M", cat: "Racing", icon: "🏍️", url: "https://images-opensocial.googleusercontent.com/gadgets/ifr?url=https://cdn.jsdelivr.net/gh/classroom6x/classroom6x.github.io@master/moto-x3m/index.xml" },
+            { name: "Paper.io 2", cat: "IO Game", icon: "📄", url: "https://paper-io.com/" },
+            { name: "Geometry Dash", cat: "Rhythm", icon: "🟩", url: "https://scratch.mit.edu/projects/65842888/embed" },
+            { name: "Drift Hunters", cat: "Racing", icon: "🏎️", url: "https://drifthunters.co/" },
+            { name: "Smash Karts", cat: "Action", icon: "🏎️", url: "https://smashkarts.io/" },
+            { name: "Shell Shockers", cat: "Shooter", icon: "🥚", url: "https://shellshock.io/" },
+            { name: "Basketball Legends", cat: "Sports", icon: "🏀", url: "https://basketbros.io/" },
+            { name: "Subway Surfers", cat: "Runner", icon: "🏃", url: "https://subwaysurfers.com/" },
+            { name: "Temple Run 2", cat: "Runner", icon: "🐒", url: "https://poki.com/en/g/temple-run-2" },
+            { name: "Tunnel Rush", cat: "Arcade", icon: "🌀", url: "https://tunnelrush.co/" },
+            { name: "BitLife", cat: "Simulation", icon: "🧬", url: "https://bitlife.cc/" },
+            { name: "OvO", cat: "Platformer", icon: "🏃‍♂️", url: "https://ovogame.io/" },
+            { name: "Basketball Stars", cat: "Sports", icon: "⛹️‍♂️", url: "https://basketball-stars.io/" },
+            { name: "VEX 7", cat: "Platformer", icon: "⚔️", url: "https://vex7.io/" },
+            { name: "Idle Miner Tycoon", cat: "Idle", icon: "⛏️", url: "https://www.kongregate.com/games/idle-miner-tycoon" },
+            { name: "Crossy Road", cat: "Arcade", icon: "🐔", url: "https://poki.com/en/g/crossy-road" },
+            { name: "Fireboy and Watergirl", cat: "Puzzle", icon: "🔥", url: "https://www.coolmathgames.com/0-fireboy-and-watergirl-in-the-forest-temple" },
+            { name: "Run 3", cat: "Runner", icon: "👽", url: "https://run3.co/" },
+            { name: "Chess.com", cat: "Board", icon: "♟️", url: "https://www.chess.com/play/computer" },
+            { name: "Dino Game", cat: "Classic", icon: "🦖", url: "https://elgoog.im/t-rex/" },
+            { name: "Bouncy Motors", cat: "Physics", icon: "🚙", url: "https://poki.com/en/g/bouncy-motors" }
+        ];
+
+        function renderGrid(filter = "") {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = "";
+
+            const filtered = popularGames.filter(g => 
+                g.name.toLowerCase().includes(filter) || g.cat.toLowerCase().includes(filter)
+            );
+
+            filtered.forEach(game => {
+                const card = document.createElement('div');
+                card.className = "game-card";
+                card.onclick = () => launchGame(game);
+                card.innerHTML = `
+                    <div class="game-thumb">${game.icon}</div>
+                    <div class="game-info">
+                        <div>
+                            <div class="game-name">${game.name}</div>
+                            <div class="game-cat">${game.cat}</div>
+                        </div>
+                        <div class="play-badge">Play</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterGames() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            renderGrid(query);
+        }
+
+        function launchGame(game) {
+            document.getElementById('catalogView').style.display = 'none';
+            document.getElementById('playerView').style.display = 'flex';
+            document.getElementById('nowPlayingTitle').innerText = game.name;
+            document.getElementById('gameFrame').src = game.url;
+        }
+
+        function goHome() {
+            document.getElementById('gameFrame').src = ""; 
+            document.getElementById('playerView').style.display = 'none';
+            document.getElementById('catalogView').style.display = 'block';
+        }
+
+        function toggleFullscreen() {
+            const frame = document.getElementById('frameBox');
+            if (!document.fullscreenElement) {
+                frame.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize full grid on load
+        renderGrid();
+    </script>
+</body>
+</html>
